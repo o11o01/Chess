@@ -48,6 +48,7 @@ namespace Chess
         {
             PieceType = PieceType.empty;
             IsWhite = false;
+        
         }
     }
     public class ChessBoard
@@ -57,7 +58,7 @@ namespace Chess
         { get; set; }
         public int WhiteScore
         { get; set; }
-        internal bool Move(int pieceRow, int pieceColumn, int newRow, int newColumn)
+        public bool Move(int pieceRow, int pieceColumn, int newRow, int newColumn)
         {
             bool validMove = false;
             for (int i = 0; i < board[pieceRow, pieceColumn].MovesList.Count; i++)
@@ -73,11 +74,15 @@ namespace Chess
                 board[pieceRow, pieceColumn].FirstMove = false;
                 board[newRow, newColumn] = board[pieceRow, pieceColumn];
                 board[pieceRow, pieceColumn] = new ChessPiece();
+                
             }
             return false;
         }
-        internal void RecordMoves()
+
+        public void RecordMoves()
         {
+            BlackScore = 0;
+            WhiteScore = 0;
             for (int row = 0; row < board.GetLength(0); row++)
             {
                 for (int column = 0; column < board.GetLength(1); column++)
@@ -359,6 +364,10 @@ namespace Chess
                         printString = "      ";
                     }
                     Console.Write($"|  {printString}  |");
+                    if(j == board.GetLength(0) - 1)
+                    { 
+                        Console.Write(8-i);
+                    }
                 }
                 for (int i2 = 0, max = 3; i2 < max; i2++)
                 {
@@ -377,7 +386,14 @@ namespace Chess
                         {
                             newLine = "|          |";
                         }
-                            
+                        if(i == board.GetLength(0)-1)
+                        {
+                            if (i2 == 2)
+                            {
+                                Char x = (char)(k + 65);
+                                newLine = $"|     {x}    |";
+                            }
+                        }
                         Console.Write($"{newLine}");
                     }
                     Console.WriteLine();
