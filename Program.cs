@@ -11,9 +11,15 @@ namespace Chess
             Board.PlacePieces(Board.board);
             Board.Display();
             Board.RecordMoves();
+            //ChessEngine Black = new ChessEngine();
+            //Node test = new Node(Board);
+            //Black.Calculate(test);    
+            //Black.Trim(test);
+            //Black.depth += 2;
+            //Black.ReCalculate(test);
+            //Console.WriteLine();
 
 
-            
             while (true)
             {
                 string ChosenPiece = Console.ReadLine();
@@ -36,7 +42,7 @@ namespace Chess
             Node test = new Node(Board);
             Black.Calculate(test);
             Black.Trim(test);
-            return Black.headBoard.childBoards[0].data.board;
+            return Black.headBoard.childBoards[0].data.CopyBoard();
         }
     }
 }

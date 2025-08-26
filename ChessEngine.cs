@@ -12,7 +12,7 @@ namespace Chess
         bool isWhite = false; 
         bool isWhiteTemp = false;
         public Node headBoard;
-        public int depth = 2;
+        public int depth = 4;
         int width = 3;
         public void NextMove(Node board)
         {
@@ -34,14 +34,20 @@ namespace Chess
                                 board.childBoards.Add(new Node(new ChessBoard()));
 
                                
-                                board.childBoards.Last().Depth = board.Depth + 1;
-                                board.childBoards.Last().data = new ChessBoard();
-                                board.childBoards.Last().data.board = (ChessPiece[,])board.data.board.Clone();
-                                board.childBoards.Last().data.Move(row, column, newRow, newColumn);
-                                board.childBoards.Last().data.RecordMoves();
-                                board.childBoards.Last().Parent = board;
-                                board.childBoards.Last().Score = board.childBoards.Last().data.WhiteScore - board.childBoards.Last().data.BlackScore;
-                                //workingNode.data.Display();
+                                
+                                board.childBoards.Last().data.board = board.data.CopyBoard();
+                                if(board.childBoards.Last().data.Move(row, column, newRow, newColumn))
+                                {
+                                    board.childBoards.Last().Depth = board.Depth + 1;
+                                    board.childBoards.Last().data.RecordMoves();
+                                   // board.childBoards.Last().Parent = board;
+                                    board.childBoards.Last().Score = board.childBoards.Last().data.WhiteScore - board.childBoards.Last().data.BlackScore;
+                                    //board.childBoards.Last().data.Display();
+                                }
+                                else
+                                {
+                                    board.childBoards.Remove(board.childBoards.Last());
+                                }
    
                             }
                         }
@@ -70,14 +76,10 @@ namespace Chess
         }
         public void Trim(Node board)
         {
-            //for (int i = 0; i < board.childBoards.Count; i++)
-            //{
-            //    Trim(board.childBoards[i]);
-            //}
             board.childBoards.Sort();
-            //if (board.childBoards.Count != 0)
-           // {
-                if (Convert.ToBoolean(board.Depth % 2))
+            if (board.childBoards.Count != 0)
+            {
+                if (board.Depth % 2 == 1)
                 {
                     board.Score = board.childBoards.Last().Score;
                     board.childBoards.RemoveRange(0, board.childBoards.Count - width);
@@ -87,7 +89,7 @@ namespace Chess
                     board.Score = board.childBoards[0].Score;
                     board.childBoards.RemoveRange(width, board.childBoards.Count - width);
                 }
-           // }
+            }
         }
         public void ReCalculate(Node board)
         {

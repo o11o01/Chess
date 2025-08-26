@@ -72,13 +72,40 @@ namespace Chess
             if (validMove)
             {
                 board[pieceRow, pieceColumn].FirstMove = false;
-                board[newRow, newColumn] = board[pieceRow, pieceColumn];
+                board[newRow, newColumn].FirstMove = board[pieceRow, pieceColumn].FirstMove;
+                board[newRow, newColumn].PieceType = board[pieceRow, pieceColumn].PieceType;
+                board[newRow, newColumn].IsWhite = board[pieceRow, pieceColumn].IsWhite;
                 board[pieceRow, pieceColumn] = new ChessPiece();
-                
+                return true; 
             }
             return false;
         }
-
+        public ChessPiece[,] CopyBoard()
+        {
+            ChessPiece[,] copyBoard = new ChessPiece[8, 8];
+            for(int row = 0; row < board.GetLength(0); row++ )
+            {
+                for(int column = 0; column < board.GetLength(1); column++ )
+                {
+                    ChessPiece temp = new ChessPiece();
+                    temp.IsWhite = board[row, column].IsWhite;
+                    temp.FirstMove = board[row, column].FirstMove;
+                    temp.PieceType = board[row, column].PieceType;
+                    //if (board[row,column].MovesList.Count == 0)
+                    //{
+                    //    RecordMoves();
+                    //}
+                    temp.MovesList = new List<int[]>();
+                    for (int i = 0; i < board[row, column].MovesList.Count; i++)
+                    {
+                        temp.MovesList.Add(board[row, column].MovesList[i]);
+                        
+                    }
+                    copyBoard[row, column] = temp;
+                }
+            }
+            return copyBoard;
+        }
         public void RecordMoves()
         {
             BlackScore = 0;
