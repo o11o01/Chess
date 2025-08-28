@@ -58,6 +58,9 @@ namespace Chess
         { get; set; }
         public int WhiteScore
         { get; set; }
+        public bool BlackCheck = false;
+        public bool WhiteCheck = false; 
+
         public bool Move(int pieceRow, int pieceColumn, int newRow, int newColumn)
         {
             bool validMove = false;
@@ -110,6 +113,7 @@ namespace Chess
         {
             BlackScore = 0;
             WhiteScore = 0;
+            
             for (int row = 0; row < board.GetLength(0); row++)
             {
                 for (int column = 0; column < board.GetLength(1); column++)
@@ -123,8 +127,14 @@ namespace Chess
                         case PieceType.pawn:
                             if (focus.IsWhite)
                             {
-                                movesEmpty.Add(new int[] { row - 1, column });
-                                if (focus.FirstMove) movesEmpty.Add(new int[] { row - 2, column });
+                                if(row > 1)if (board[row - 1, column].PieceType == PieceType.empty)
+                                {
+                                    movesEmpty.Add(new int[] { row - 1, column });
+                                    if(row > 2)if (board[row - 2, column].PieceType == PieceType.empty)
+                                    {
+                                        if (focus.FirstMove) movesEmpty.Add(new int[] { row - 2, column });
+                                    }
+                                }
                                 focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
                                 movesEmpty.Clear();
                                 movesEmpty.Add(new int[] { row - 1, column - 1 });
@@ -134,8 +144,14 @@ namespace Chess
                             }
                             else
                             {
-                                movesEmpty.Add(new int[] { row + 1, column });
-                                if (focus.FirstMove) movesEmpty.Add(new int[] { row + 2, column });
+                                if(row < 7)if(board[row + 1, column].PieceType == PieceType.empty)
+                                {
+                                    movesEmpty.Add(new int[] { row + 1, column });
+                                    if(row < 6)if (board[row + 2, column].PieceType == PieceType.empty)
+                                    {
+                                        if (focus.FirstMove) movesEmpty.Add(new int[] { row + 2, column });
+                                    }
+                                }
                                 focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
                                 movesEmpty.Clear();
                                 movesEmpty.Add(new int[] { row + 1, column - 1 });
@@ -165,6 +181,8 @@ namespace Chess
                                 }
                                 columnCheck++;
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int rowCheck = row, columnCheck = column; rowCheck > -1 && columnCheck < 8; rowCheck--)
                             {
                                 if (rowCheck != row && columnCheck != column)
@@ -173,6 +191,8 @@ namespace Chess
                                 }
                                 columnCheck++;
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int rowCheck = row, columnCheck = column; rowCheck < 8 && columnCheck > -1; rowCheck++)
                             {
                                 if (rowCheck != row && columnCheck != column)
@@ -181,6 +201,8 @@ namespace Chess
                                 }
                                 columnCheck--;
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int rowCheck = row, columnCheck = column; rowCheck > -1 && columnCheck > -1; rowCheck--)
                             {
                                 if (rowCheck != row && columnCheck != column)
@@ -190,6 +212,7 @@ namespace Chess
                                 columnCheck--;
                             }
                             focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             break;
                         case PieceType.rook:
                             for(int rowCheck = row; rowCheck < 8; rowCheck++)
@@ -232,26 +255,55 @@ namespace Chess
                         case PieceType.queen:
                             for (int rowCheck = row; rowCheck < 8; rowCheck++)
                             {
-                                movesEmpty.Add(new int[] { rowCheck, column });
+                                if (rowCheck != row)
+                                {
+                                    movesEmpty.Add(new int[] { rowCheck, column });
+                                }
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int rowCheck = row; rowCheck > -1; rowCheck--)
                             {
-                                movesEmpty.Add(new int[] { rowCheck, column });
+                                if (rowCheck != row)
+                                {
+                                    movesEmpty.Add(new int[] { rowCheck, column });
+                                }
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int columnCheck = column; columnCheck < 8; columnCheck++)
                             {
-                                movesEmpty.Add(new int[] { row, columnCheck });
+                                if (columnCheck != column)
+                                {
+                                    movesEmpty.Add(new int[] { row, columnCheck });
+                                }
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             for (int columnCheck = column; columnCheck > -1; columnCheck--)
                             {
-                                movesEmpty.Add(new int[] { row, columnCheck });
+                                if (columnCheck != column)
+                                {
+                                    movesEmpty.Add(new int[] { row, columnCheck });
+                                }
                             }
+                            focus.MovesList.AddRange(Check(movesEmpty, focus.IsWhite));
+                            movesEmpty.Clear();
                             goto case PieceType.bishop;
                         case PieceType.king:
-
+                            movesEmpty.Add(new int[] { row - 1, column + 1 });
+                            movesEmpty.Add(new int[] { row - 1, column });
+                            movesEmpty.Add(new int[] { row - 1, column - 1 });
+                            movesEmpty.Add(new int[] { row , column - 1 });
+                            movesEmpty.Add(new int[] { row , column + 1});
+                            movesEmpty.Add(new int[] { row + 1, column - 1 });
+                            movesEmpty.Add(new int[] { row + 1, column });
+                            movesEmpty.Add(new int[] { row + 1, column + 1});
+                            focus.MovesList.AddRange(CheckKnight(movesEmpty, focus.IsWhite));
                             break;
                     }
                     movesEmpty.Clear();
+                    
                 }
             }
         }
@@ -274,6 +326,9 @@ namespace Chess
                     break;
                 case PieceType.queen:
                     value = 9;
+                    break;
+                case PieceType.king:
+                    value = 41;
                     break;
             }
             if (input.IsWhite)
@@ -303,6 +358,17 @@ namespace Chess
                         else
                         {
                             check.RemoveRange(i + 1, check.Count - i -1);
+                            if (board[row, column].PieceType == PieceType.king)
+                            {
+                                if (board[row,column].IsWhite)
+                                {
+                                    WhiteCheck = true; 
+                                }
+                                else
+                                {
+                                    BlackCheck = true; 
+                                }
+                            }
                             return check;
                         }
                     }
@@ -330,6 +396,20 @@ namespace Chess
                         {
                             check.RemoveAt(i);
                             continue;
+                        }
+                        if (board[row, column].PieceType == PieceType.king)
+                        {
+                            if (board[row, column].PieceType == PieceType.king)
+                            {
+                                if (board[row, column].IsWhite)
+                                {
+                                    WhiteCheck = true;
+                                }
+                                else
+                                {
+                                    BlackCheck = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -382,15 +462,21 @@ namespace Chess
                     string printString = "";
                     if (board[i, j].PieceType != PieceType.empty)
                     {
-                        printString = (board[i, j].PieceType.ToString()).PadLeft(5).PadRight(6);
-
-                     
+                            printString = (board[i, j].PieceType.ToString()).PadLeft(5).PadRight(6);
                     }
                     else
                     {
                         printString = "      ";
                     }
-                    Console.Write($"|  {printString}  |");
+
+                    Console.Write("|  ");
+                    if (!board[i,j].IsWhite)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.Write(printString);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  |");
                     if(j == board.GetLength(0) - 1)
                     { 
                         Console.Write(8-i);

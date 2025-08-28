@@ -12,8 +12,8 @@ namespace Chess
         bool isWhite = false; 
         bool isWhiteTemp = false;
         public Node headBoard;
-        public int depth = 4;
-        int width = 3;
+        public int depth = 2;
+        int width = 2;
         public void NextMove(Node board)
         {
             for (int row = 0; row < board.data.board.GetLength(0); row++)
@@ -65,13 +65,14 @@ namespace Chess
                 
             }
             NextMove(board);
-            for (int i = 0; i < board.childBoards.Count; i++ )
+            // foreach(Node temp in board.childBoards)
+            Parallel.ForEach(board.childBoards, temp =>
             {
-                    if (board.Depth < depth)
-                    {
-                        Calculate(board.childBoards[i]);
-                    }
-            }
+                if (board.Depth < depth)
+                {
+                    Calculate(temp);
+                }
+            });
             Trim(board);
         }
         public void Trim(Node board)
@@ -79,6 +80,8 @@ namespace Chess
             board.childBoards.Sort();
             if (board.childBoards.Count != 0)
             {
+                width = (board.Depth)+2;
+
                 if (board.Depth % 2 == 1)
                 {
                     board.Score = board.childBoards.Last().Score;
